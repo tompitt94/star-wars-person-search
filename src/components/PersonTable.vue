@@ -1,9 +1,7 @@
+<!-- Component to retrieve the character data and display in a table format -->
 <script setup>
 defineProps({
-  tableData: {
-    type: Object,
-    required: true,
-  },
+  //This will be used to filter the results displayed in the table if the user begins to type a character name
   characterName: {
     type: String,
     required: false,
@@ -12,7 +10,7 @@ defineProps({
 </script>
 
 <template>
-  <div>
+  <div class="table-container">
     <table class="table is-hoverable is-fullwidth">
       <thead>
         <tr>
@@ -20,27 +18,30 @@ defineProps({
         </tr>
       </thead>
       <tbody>
+        <!-- Using v-for to loop through filteredCharacters to avoid hard coding data -->
         <tr v-for="person in filteredCharacters" :key="person.name">
           <td>{{ person.name }}</td>
-          <td>{{ person.height }}cm</td>
-          <td>{{ person.mass }}Kg</td>
-          <td>{{ new Date(person.created).toLocaleDateString("en-GB") }}</td>
-          <td>{{ new Date(person.edited).toLocaleDateString("en-GB") }}</td>
-          <td></td>
+          <td>
+            {{ person.height }}
+            <!--Included conditional unit in case of unknown data-->
+            <span v-if="person.height !== 'unknown'">cm</span>
+          </td>
+          <td>
+            {{ person.mass }}
+            <!--Included conditional unit in case of unknown data-->
+            <span v-if="person.mass !== 'unknown'">Kg</span>
+          </td>
+          <td>
+            <!--Transforming date into readable and familiar formats-->
+            {{ new Date(person.created).toLocaleDateString("en-GB") }}
+          </td>
+          <td>
+            <!--Transforming date into readable and familiar formats-->
+            {{ new Date(person.edited).toLocaleDateString("en-GB") }}
+          </td>
         </tr>
       </tbody>
     </table>
-    <nav class="pagination is-rounded" role="navigation" aria-label="pagination">
-      <ul class="pagination-list">
-        <li><a class="pagination-link" aria-label="Goto page 1">1</a></li>
-        <li><span class="pagination-ellipsis">&hellip;</span></li>
-        <li><a class="pagination-link" aria-label="Goto page 45">45</a></li>
-        <li><a class="pagination-link is-current" aria-label="Page 46" aria-current="page">46</a></li>
-        <li><a class="pagination-link" aria-label="Goto page 47">47</a></li>
-        <li><span class="pagination-ellipsis">&hellip;</span></li>
-        <li><a class="pagination-link" aria-label="Goto page 86">86</a></li>
-      </ul>
-    </nav>
   </div>
 </template>
 
@@ -48,23 +49,18 @@ defineProps({
 export default {
   data() {
     return {
-      tableColumns: [
-        "Name",
-        "Height",
-        "Mass",
-        "Created",
-        "Edited",
-        "Planet Name",
-      ],
-      people: []
+      tableColumns: ["Name", "Height", "Mass", "Created", "Edited"],
+      characters: [], // Will be populated on Mount and have all characters pushed into it
     };
   },
   computed: {
     filteredCharacters() {
+      // Return full list of characters if no search terms are provided by the user
       if (!this.characterName) {
-        return this.people;
+        return this.characters;
       } else {
-        return this.people.filter((character) =>
+        // Check for any character names that contain the search terms provided by the user
+        return this.characters.filter((character) =>
           character.name
             .toLowerCase()
             .includes(this.characterName.toLowerCase())
@@ -72,10 +68,40 @@ export default {
       }
     },
   },
-  mounted() {
-    fetch("https://swapi.dev/api/people/")
-      .then((response) => response.json())
-      .then((data) => (this.people = data.results));
+  async mounted() {
+    // Setting the base URL for the People endpoint
+    const baseUrl = "https://swapi.dev/api/people/?page=";
+    // Setting the first page to be called
+    let page = 1;
+    // Using this to check if there is a next page to end
+    let lastResult = [];
+
+    do {
+      // error checks
+      try {
+        const resp = await fetch(`${baseUrl}${page}`);
+        const data = await resp.json();
+        lastResult = data;
+
+        data.results.forEach((person) => {
+          // Destructure the person object to add only necessary information
+          const { name, height, mass, created, edited } = person;
+          // pushing data to create one large array
+          this.characters.push({
+            name,
+            height,
+            mass,
+            created,
+            edited,
+          });
+        });
+        // Increment API page number
+        page++;
+      } catch (err) {
+        console.error(`The force is not strong right now - ${err}`);
+      }
+      // Keep going until no "next" page is provided
+    } while (lastResult.next !== null);
   },
 };
 </script>

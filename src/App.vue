@@ -4,10 +4,14 @@ import PersonFilter from "./components/PersonFilter.vue";
 </script>
 
 <template>
-  <div class="container">
+  <div>
     <main class="container">
-      <PersonFilter @searching="charSearch" />
-      <PersonTable :characterName="characterSearch" />
+      <div class="block">
+        <PersonFilter @searching="charSearch" />
+      </div>
+      <div class="block">
+        <PersonTable :characterName="characterSearch" />
+      </div>
     </main>
   </div>
 </template>
@@ -21,8 +25,9 @@ export default {
   },
   methods: {
     charSearch(data) {
-      this.characterSearch = data
-    }
+      // Updates characterSearch which is passed to the personTable component via prop
+      this.characterSearch = data;
+    },
   },
 };
 </script>
