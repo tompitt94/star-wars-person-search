@@ -1,35 +1,9 @@
 # star-wars-person-search
 
-This template should help get you started developing with Vue 3 in Vite.
+A program to search the People list from SWAPI. This displays basic information such as name, weight, height and the date the character was added to and last edited within the database.
 
-## Recommended IDE Setup
+I was going to use Axios but decided to stick with the fetch api call on this one. I created an async function to collate all the API data into one array due to pagination on the initial API responses.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+There are 2 components:
+  1. A filter component that allows the user to type the name of the character they wish to view
+  2. A table component to display the collated data or filtered data based on the user input
