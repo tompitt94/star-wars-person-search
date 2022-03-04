@@ -10,7 +10,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="table-container">
+  <div class="table-container mb-5">
     <table class="table is-hoverable is-fullwidth">
       <thead>
         <tr>
@@ -18,6 +18,9 @@ defineProps({
         </tr>
       </thead>
       <tbody>
+        <tr v-if="filteredCharacters.length === 0">
+          <td>The Force has not provided any results</td>
+        </tr>
         <!-- Using v-for to loop through filteredCharacters to avoid hard coding data -->
         <tr v-for="person in filteredCharacters" :key="person.name">
           <td>{{ person.name }}</td>

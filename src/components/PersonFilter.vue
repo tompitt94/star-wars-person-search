@@ -6,7 +6,7 @@
       <input
         class="input"
         type="text"
-        placeholder="Use the force....to search by the characters name"
+        placeholder="*Yoda Voice* Search for character name you can"
         v-model="name"
         @keyup="search"
       />
