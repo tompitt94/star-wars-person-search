@@ -42,6 +42,12 @@ defineProps({
             <!--Transforming date into readable and familiar formats-->
             {{ new Date(person.edited).toLocaleDateString("en-GB") }}
           </td>
+          <td>
+            <!-- Comparing planets Object Array for Planet URL and Homeworld URL -->
+            {{
+              this.planets.find((planet) => planet.url == person.homeworld).name
+            }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -52,9 +58,43 @@ defineProps({
 export default {
   data() {
     return {
-      tableColumns: ["Name", "Height", "Mass", "Created", "Edited"],
+      tableColumns: [
+        "Name",
+        "Height",
+        "Mass",
+        "Created",
+        "Edited",
+        "Home Planet",
+      ],
       characters: [], // Will be populated on Mount and have all characters pushed into it
+      planets: [],
     };
+  },
+  methods: {
+    // Function to reun through the SWAPI endpoints
+    async fetchApiResults(url, array) {
+      // Setting the first page to be called
+      let page = 1;
+      // Using this to check if there is a next page to end
+      let lastResult = [];
+
+      do {
+        try {
+          const resp = await fetch(`${url}${page}`);
+          const data = await resp.json();
+          lastResult = data;
+          // pushing data to create one large array
+          data.results.forEach((item) => {
+            array.push(item);
+          });
+          // Increment API page number
+          page++;
+        } catch (err) {
+          console.error(`The force is not strong right now - ${err}`);
+        }
+        // Keep going until no "next" page is provided
+      } while (lastResult.next !== null);
+    },
   },
   computed: {
     filteredCharacters() {
@@ -72,39 +112,12 @@ export default {
     },
   },
   async mounted() {
-    // Setting the base URL for the People endpoint
-    const baseUrl = "https://swapi.dev/api/people/?page=";
-    // Setting the first page to be called
-    let page = 1;
-    // Using this to check if there is a next page to end
-    let lastResult = [];
+    this.fetchApiResults(
+      "https://swapi.dev/api/people/?page=",
+      this.characters
+    );
 
-    do {
-      // error checks
-      try {
-        const resp = await fetch(`${baseUrl}${page}`);
-        const data = await resp.json();
-        lastResult = data;
-
-        data.results.forEach((person) => {
-          // Destructure the person object to add only necessary information
-          const { name, height, mass, created, edited } = person;
-          // pushing data to create one large array
-          this.characters.push({
-            name,
-            height,
-            mass,
-            created,
-            edited,
-          });
-        });
-        // Increment API page number
-        page++;
-      } catch (err) {
-        console.error(`The force is not strong right now - ${err}`);
-      }
-      // Keep going until no "next" page is provided
-    } while (lastResult.next !== null);
+    this.fetchApiResults("https://swapi.dev/api/planets/?page=", this.planets);
   },
 };
 </script>
