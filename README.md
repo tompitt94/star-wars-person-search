@@ -1,9 +1,9 @@
 # star-wars-person-search
 
-Project setup
+# Project setup
 npm install
 
-Compiles and hot-reloads for development
+# Compiles and hot-reloads for development
 npm run serve
 
 A program to search the People list from SWAPI. This displays basic information such as name, weight, height and the date the character was added to and last edited within the database.
